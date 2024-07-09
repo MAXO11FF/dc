@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord ID Display</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="display-container">
+        <div id="discord-id"></div>
+        <canvas id="snowfall"></canvas>
+    </div>
+
+    <script>
+        const clientId = '1248218190262042674';
+        const clientSecret = 'OFQJXiuHLb-9z2jb816TBPstxwCV0vxq'; // Replace with your actual client secret
+
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const code = urlParams.get('code');
+
+        if (code) {
+            fetch('https://discord.com/api/oauth2/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    client_id: clientId,
+                    client_secret: clientSecret,
+                    grant_type: 'authorization_code',
+                    code: code,
+                    redirect_uri: 'https://maxo11ff.github.io/dc/'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                return fetch('https://discord.com/api/users/@me', {
+                    headers: {
+                        authorization: `Bearer ${data.access_token}`
+                    }
+                });
+            })
+            .then(response => response.json())
+            .then(userData => {
+                document.getElementById('discord-id').textContent = `Hello, ${userData.username}#${userData.discriminator}`;
+                startSnowfall();
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        function startSnowfall() {
+            const canvas = document.getElementById('snowfall');
+            const ctx = canvas.getContext('2d');
+            const snowflakes = [];
+
+            function createSnowflakes() {
+                const numFlakes = 100;
+                for (let i = 0; i < numFlakes; i++) {
+                    snowflakes.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        radius: Math.random() * 4 + 1,
+                        speed: Math.random() * 1 + 0.5
+                    });
+                }
+            }
+
+            function drawSnowflakes() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'white';
+                ctx.beginPath();
+                snowflakes.forEach(flake => {
+                    ctx.moveTo(flake.x, flake.y);
+                    ctx.arc(flake.x, flake.y, flake.radius, 0, Math.PI * 2);
+                });
+                ctx.fill();
+                moveSnowflakes();
+            }
+
+            function moveSnowflakes() {
+                snowflakes.forEach(flake => {
+                    flake.y += flake.speed;
+                    if (flake.y > canvas.height) {
+                        flake.y = 0;
+                        flake.x = Math.random() * canvas.width;
+                    }
+                });
+            }
+
+            function update() {
+                drawSnowflakes();
+                requestAnimationFrame(update);
+            }
+
+            createSnowflakes();
+            update();
+        }
+
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('snowfall');
+            canvas.width = 600;
+            canvas.height = 600;
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('snowfall');
+            canvas.width = 600;
+            canvas.height = 600;
+        });
+    </script>
+</body>
+</html>
