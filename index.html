@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Discord ID Display</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <div id="display-container">
@@ -14,7 +14,7 @@
 
     <script>
         const clientId = '1248218190262042674';
-        const clientSecret = 'OFQJXiuHLb-9z2jb816TBPstxwCV0vxq'; // Replace with your actual client secret
+        const clientSecret = 'OFQJXiuHLb-9z2jb816TBPstxwCV0vxq'; // Your actual client secret
 
         const queryString = window.location.search;
         const urlParams = new URLSearchParams(queryString);
@@ -31,7 +31,7 @@
                     client_secret: clientSecret,
                     grant_type: 'authorization_code',
                     code: code,
-                    redirect_uri: 'https://maxo11ff.github.io/dc/'
+                    redirect_uri: 'https://maxo11ff.github.io/auth.html' // Update with your GitHub Pages URL
                 })
             })
             .then(response => response.json())
@@ -45,6 +45,7 @@
             .then(response => response.json())
             .then(userData => {
                 document.getElementById('discord-id').textContent = `Hello, ${userData.username}#${userData.discriminator}`;
+                document.getElementById('display-container').style.display = 'flex';
                 startSnowfall();
             })
             .catch(error => console.error('Error:', error));
